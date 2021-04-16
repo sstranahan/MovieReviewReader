@@ -3,7 +3,6 @@
 
 <!--TODO: Style, add pagination, search by date, add news page, icons for crit picks, etc-->
 
-
 <head>
     <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
     <meta charset="UTF-8">
@@ -59,6 +58,7 @@
 
 <body>
 
+<!--                        Top menu UI elements                             -->
 <h1 style="text-align: center">My Movie Reviews</h1>
 <h2 style="text-align: center">Powered by the New York Times</h2>
 <p style="text-align: center">Film Title <input id="searchBar">
@@ -81,12 +81,28 @@
     </select>
         <button id="submit">Submit</button></p>
 
+
+<!--                           Div for table                                -->
 <div id='table'></div>
 
+
+<!--                      Bottom menu UI elements                           -->
 <p style="text-align: center"><button id="prevButton" disabled>Previous Page<button id="nextButton" disabled>Next Page</button></button></p>
 
 
 <script type="text/javascript">
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////////////////////// Global variables ////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
+    var startYr;
+    var endYr;
+    var hasMore = false;
+
+    ////////////////////////////////////////////////////////////////////////
+    ///////////////////////////// Bindings /////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     $("#submit").bind("click", buttonHandler);
 
@@ -94,8 +110,13 @@
 
     $("#endYear").bind("change", endYrHandler);
 
-    var startYr;
-    var endYr;
+    $("nextButton").bind("click", nextHandler);
+
+    $("prevButton").bind("click", prevHandler);
+
+    ////////////////////////////////////////////////////////////////////////
+    ///////////////////// UI element event handlers ////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
     function startYrHandler(event) {
            startYr = $("#startYear").val();
@@ -134,6 +155,10 @@
         $.ajax(ajaxObj);
     }
 
+    ////////////////////////////////////////////////////////////////////////
+    ///////////////////// JSON Returned Success Handler ////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
     function onSuccess(response) {
         p = response;
 
@@ -141,7 +166,11 @@
         n = res.length;
 
         offset = 0;
-        hasMore = res.has_more;
+        hasMore = p.has_more;
+
+        if (hasMore == true) {
+            $('#nextButton').removeAttr('disabled');
+        }
 
         tableStr = '<table><tr class = "top"><td>Image</td><td>Title</td><td>Rating</td><td>Critics Pick</td><td>Headline</td><td>Date</td><td>Link</td></tr>';
 
@@ -182,14 +211,14 @@
 
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    ///////////////////// JSON Returned Error Handler //////////////////////
+    ////////////////////////////////////////////////////////////////////////
+
     function onError(response) {
-        q = response;
+        q = response;               // Just a global for debuggin in browser
     }
-
-    if (hasMore === 'true') {
-        $('#nextButton').toggleClass('active');
-    }
-
 
 
 </script>
