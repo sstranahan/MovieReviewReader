@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--TODO: Style, add pagination, search by date, add news page, icons for crit picks, etc-->
+
+
+<head>
+    <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+
+    <style type="text/css">
+
+        .myStyle {
+            color: blue;
+        }
+
+        .shaded {
+            background: blanchedalmond;
+        }
+
+        .top {
+            text-align: center;
+            text-decoration: cornflowerblue;
+        }
+
+        table {
+            border: blue;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: normal;
+            border: 3px;
+            /*border-collapse: collapse;*/
+            /*width: 100%;*/
+            max-width: 100%;
+            white-space: nowrap;
+            background-color: white;
+        }
+        td {
+            font-family: "Courier New", sans-serif;
+            font-size: 2em;
+            padding: .3em;
+            text-align: center;
+        }
+        td .top {
+            font-family: Cambria, sans-serif;
+            font-size: 3em;
+            text-align: center;
+        }
+
+        button {
+            font-size: 2em;
+        }
+
+    </style>
+
+    <title>My Movie Reviews</title>
+
+</head>
+
+<body>
+
+<h1 style="text-align: center">My Movie Reviews</h1>
+<h2 style="text-align: center">Powered by the New York Times</h2>
+<p style="text-align: center">Film Title <input id="searchBar">
+    Filmed Between:
+    <select name = "Start Year" id="startYear">
+        <option value ="1960">1960</option>
+        <option value ="1970">1970</option>
+        <option value ="1980">1980</option>
+        <option value ="1990">1990</option>
+        <option value ="2000">2000</option>
+        <option value ="2010">2010</option>
+    </select>
+    <select name = "End Year" id="endYear">
+        <option value ="1970">1970</option>
+        <option value ="1980">1980</option>
+        <option value ="1990">1990</option>
+        <option value ="2000">2000</option>
+        <option value ="2010">2010</option>
+        <option value ="2020">2020</option>
+    </select>
+        <button id="submit">Submit</button></p>
+
+<div id='table'></div>
+
+<p style="text-align: center"><button id="prevButton" disabled>Previous Page<button id="nextButton" disabled>Next Page</button></button></p>
+
+
+<script type="text/javascript">
+
+    $("#submit").bind("click", buttonHandler);
+
+    $("#startYear").bind("change", startYrHandler);
+
+    $("#endYear").bind("change", endYrHandler);
+
+    var startYr;
+    var endYr;
+
+    function startYrHandler(event) {
+           startYr = $("#startYear").val();
+
+    };
+
+    function endYrHandler(event) {
+        endYr = $("#endYear").val();
+
+    };
+
+    function buttonHandler(event) {
+        if (startYr!=null && endYr!=null) {
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: startYr,
+                endYear: endYr
+            };
+        } else {
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: $('#startYear').val(),
+                endYear: $('#endYear').val()
+            };
+        }
+
+        ajaxObj =  {
+            url: 'Main.php',
+            type: 'get',
+            dataType: 'json',
+            data: myData,
+            success: onSuccess,
+            error: onError
+        };
+
+        $.ajax(ajaxObj);
+    }
+
+    function onSuccess(response) {
+        p = response;
+
+        res = p.results;
+        n = res.length;
+
+        offset = 0;
+        hasMore = res.has_more;
+
+        tableStr = '<table><tr class = "top"><td>Image</td><td>Title</td><td>Rating</td><td>Critics Pick</td><td>Headline</td><td>Date</td><td>Link</td></tr>';
+
+        for (let i = 0; i < n; i++) {
+            tableStr += "<tr>";
+
+            if (res[i].multimedia != null) {
+                tableStr += "<td><img width=210 height=140 src = '" + res[i].multimedia.src + "' ></td>"
+            } else {
+                tableStr += "<td></td>";
+            }
+            tableStr += "<td>" + res[i].display_title + "</td>"
+            tableStr += "<td>" + res[i].mpaa_rating + "</td>"
+
+
+            if (res[i].critics_pick === 1) {
+                pickStr = "YES!";
+            } else {
+                pickStr = "NO";
+            }
+
+            tableStr += "<td>" + pickStr + "</td>";
+            tableStr += "<td>" + res[i].headline + "</td>";
+            tableStr += "<td>" + res[i].date_updated + "</td>";
+            tableStr += "<td><a href='" + res[i].link.url + "'>" + res[i].link.suggested_link_text + "</a></td>";
+
+            tableStr += "</tr>";
+
+            tableStr += "<tr>";
+            tableStr += "<td Colspan='7'>" + res[i].summary_short + "</td>";
+            tableStr += "</tr>";
+
+        }
+
+        tableStr += '</table>';
+
+        $("#table").html(tableStr);
+
+    }
+
+    function onError(response) {
+        q = response;
+    }
+
+    if (hasMore === 'true') {
+        $('#nextButton').toggleClass('active');
+    }
+
+
+
+</script>
+</body>
+</html>
