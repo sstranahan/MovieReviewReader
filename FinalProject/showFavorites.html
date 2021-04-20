@@ -167,7 +167,7 @@
 
 <!--                      Bottom menu UI elements                           -->
 <div class="bottomMenu">
-    <p style="text-align: center"><button id="clear">Clear Favorites</button><button id="goBack" onclick="window.location.href='../mydocs/index.html'">Go Back</button></p>
+    <p style="text-align: center"><button style="font-size: 18px" id="clear">Clear Favorites</button><button style="font-size: 18px" id="goBack" onclick="window.location.href='../mydocs/index.html'">Go Back</button></p>
 </div>
 
 
@@ -202,7 +202,7 @@
     }
 
     function onClearSuccess(){
-        tableStr = '<div class="tbl-header"><table><thead><tr><th>Remove from Favorites</th><th>Image</th><th>Title</th><th>Rating</th><th>Critics Pick</th>' +
+        tableStr = '<div class="tbl-header"><table><thead><tr><th>Remove</th><th>Image</th><th>Title</th><th>Rating</th><th>Critics Pick</th>' +
             '<th>Headline</th><th>Date</th><th>Link</th></tr></thead></table></div><div class=\'tbl-content\'><table>';
         tableStr += "<tr>";
         tableStr += "<td Colspan='7'>" + "" + "</td>";
@@ -310,8 +310,6 @@
         console.log(ee);
     }
 
-
 </script>
-
 </body>
 </html>
