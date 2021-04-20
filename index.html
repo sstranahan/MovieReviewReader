@@ -358,9 +358,9 @@
 
 
             if (res[i].critics_pick === 1) {
-                pickStr = "YES!";
+                pickStr = "<img width=35% src=images/thumbs-up.png>";
             } else {
-                pickStr = "NO";
+                pickStr = "<img width=35% src=images/thumbs-down.png>";
             }
 
             tableStr += "<td>" + pickStr + "</td>";
@@ -394,7 +394,9 @@
         id = evt.target.id;
         index = parseInt(id);
         console.log("displayTitle: " + res[index].display_title);
-        console.log("imgURL: " + res[index].multimedia.src);
+        if (res[index].multimedia != null) {
+            console.log("imgURL: " + res[index].multimedia.src);
+        }
         console.log("MPAARating: " + res[index].mpaa_rating);
         console.log("headline: " + res[index].headline);
         console.log("dateUpdated: " + res[index].date_updated);
@@ -402,7 +404,7 @@
         console.log("suggText: " + res[index].link.suggested_link_text);
         console.log("summary: " + res[index].summary_short);
 
-        if (res[index].multimedia.src != null) {
+        if (res[index].multimedia != null) {
             myData = {
                 displayTitle: res[index].display_title,
                 imgURL: res[index].multimedia.src,
@@ -416,7 +418,7 @@
         } else {
             myData = {
                 displayTitle: res[index].display_title,
-                imgURL: null,
+                imgURL: "null",
                 mpaaRating: res[index].mpaa_rating,
                 headline: res[index].headline,
                 dateUpdated: res[index].date_updated,
