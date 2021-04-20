@@ -65,7 +65,6 @@
     .topMenu {
         padding: 4px;
         margin: 4px;
-
         font-size: 14px;
         color: #fff;
         text-transform: uppercase;
@@ -73,7 +72,9 @@
         text-align: center;
         margin-bottom: 15px;
         text-shadow: 1px 1px 1px black;
+
     }
+
     .bottomMenu {
         padding: 4px;
         margin: 4px;
@@ -82,6 +83,9 @@
     p {
         margin: 4px;
         padding: 4px;
+    }
+    .add_button {
+        font-size: 2em;
     }
 
 
@@ -148,7 +152,7 @@
 <h1 style="text-align: center">My Movie Reviews</h1>
 <h2 style="text-align: center">Powered by the New York Times</h2>
 
-<div class="topMenu"><p style="text-align: center"> Film Title: <input id="searchBar">
+<div class="topMenu" ><span width=100% style="text-align: center"> Film Title: <input id="searchBar">
      Filmed Between:
     <select id="startYear" name = "Start Year">
         <option value ="1960">1960</option>
@@ -167,7 +171,7 @@
         <option value ="2020">2020</option>
     </select>
         <button id="submit">Submit</button>
-</p>
+</span>
 </div>
 
 
@@ -177,7 +181,8 @@
 
 <!--                      Bottom menu UI elements                           -->
 <div class="bottomMenu">
-<p style="text-align: center"><button disabled id="prevButton">Previous Page<button disabled id="nextButton">Next Page</button></button></p>
+<p style="text-align: center"><button disabled id="prevButton">Previous Page<button disabled id="nextButton">Next Page</button></button>
+    <button id="viewFavorites" onclick="window.location.href='../mydocs/showFavorites.html'">View Favorites</button></p>
 </div>
 
 <script type="text/javascript">
@@ -218,7 +223,11 @@
     };
 
     function buttonHandler(event) {
+
+        offset = 0;
+
         if (startYr!=null && endYr!=null) {
+
             myData = {
                 searchTerm: $('#searchBar').val(),
                 startYear: startYr,
@@ -248,12 +257,64 @@
 
     function nextHandler(event) {
         offset += 20;
-        $('#submit').click();
+        if (startYr!=null && endYr!=null) {
+
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: startYr,
+                endYear: endYr,
+                offset: offset
+            };
+        } else {
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: $('#startYear').val(),
+                endYear: $('#endYear').val(),
+                offset: offset
+            };
+        }
+
+        ajaxObj =  {
+            url: 'Main.php',
+            type: 'get',
+            dataType: 'json',
+            data: myData,
+            success: onSuccess,
+            error: onError
+        };
+
+        $.ajax(ajaxObj);
     }
 
     function prevHandler(event) {
         offset -= 20;
-        $('#submit').click();
+        if (startYr!=null && endYr!=null) {
+
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: startYr,
+                endYear: endYr,
+                offset: offset
+            };
+        } else {
+            myData = {
+                searchTerm: $('#searchBar').val(),
+                startYear: $('#startYear').val(),
+                endYear: $('#endYear').val(),
+                offset: offset
+            };
+        }
+
+        ajaxObj =  {
+            url: 'Main.php',
+            type: 'get',
+            dataType: 'json',
+            data: myData,
+            success: onSuccess,
+            error: onError
+        };
+
+        $.ajax(ajaxObj);
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -280,11 +341,12 @@
             $('#prevButton').prop('disabled', true);
         }
 
-        tableStr = '<div class="tbl-header"><table><thead><tr><th>Image</th><th>Title</th><th>Rating</th><th>Critics Pick</th>' +
+        tableStr = '<div class="tbl-header"><table><thead><tr><th>Add</th><th>Image</th><th>Title</th><th>Rating</th><th>Critics Pick</th>' +
             '<th>Headline</th><th>Date</th><th>Link</th></tr></thead></table></div><div class=\'tbl-content\'><table>';
 
         for (let i = 0; i < n; i++) {
             tableStr += "<tr>";
+            tableStr += "<td><button class='add_button' id = '" + i + "'>+</button></td>";
 
             if (res[i].multimedia != null) {
                 tableStr += "<td><img width=100% src = '" + res[i].multimedia.src + "' ></td>"
@@ -318,6 +380,73 @@
 
         $("#table").html(tableStr);
 
+        for(i=0;i<n;i++)
+        {
+            $("#" + i).bind('click', addToFavorites);
+        }
+
+    }
+
+    function addToFavorites(evt)
+    {
+        k = evt;
+
+        id = evt.target.id;
+        index = parseInt(id);
+        console.log("displayTitle: " + res[index].display_title);
+        console.log("imgURL: " + res[index].multimedia.src);
+        console.log("MPAARating: " + res[index].mpaa_rating);
+        console.log("headline: " + res[index].headline);
+        console.log("dateUpdated: " + res[index].date_updated);
+        console.log("linkURL: " + res[index].link.url);
+        console.log("suggText: " + res[index].link.suggested_link_text);
+        console.log("summary: " + res[index].summary_short);
+
+        if (res[index].multimedia.src != null) {
+            myData = {
+                displayTitle: res[index].display_title,
+                imgURL: res[index].multimedia.src,
+                mpaaRating: res[index].mpaa_rating,
+                headline: res[index].headline,
+                dateUpdated: res[index].date_updated,
+                linkURL: res[index].link.url,
+                linkText: res[index].link.suggested_link_text,
+                summary: res[index].summary_short
+            };
+        } else {
+            myData = {
+                displayTitle: res[index].display_title,
+                imgURL: null,
+                mpaaRating: res[index].mpaa_rating,
+                headline: res[index].headline,
+                dateUpdated: res[index].date_updated,
+                linkURL: res[index].link.url,
+                linkText: res[index].link.suggested_link_text,
+                summary: res[index].summary_short
+            };
+        }
+
+        ajaxObj = {
+            url: './addToFavorites.php',
+            type: 'post',
+            dataType: 'json',     //type of data returned from server
+            data: myData,         //data to pass to php
+            success: showFavorites,
+            error: onFavoritesError
+        };
+
+        $.ajax(ajaxObj);
+    }
+
+    function showFavorites(r)
+    {
+        es = r;
+
+    }
+
+    function onFavoritesError(response)
+    {
+        ee = response;
     }
 
 
